@@ -11,9 +11,8 @@ import { errorMiddleware } from "./middlewares/errorMiddleware.js";
 
 export const app = express();
 
-if (process.env.NODE_ENV === "production") {
-  app.set("trust proxy", 1);
-}
+// Always trust one proxy hop (NGINX reverse proxy in all environments)
+app.set("trust proxy", 1);
 
 app.use(helmetMiddleware);
 app.use(corsMiddleware);
