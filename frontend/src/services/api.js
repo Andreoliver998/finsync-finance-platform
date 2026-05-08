@@ -3,15 +3,9 @@ import axios from "axios";
 const OFFICIAL_API_URL = "https://api-finsync.paytech.app.br/api";
 const AUTH_TOKEN_KEYS = [
   "finsync:token",
-  "token",
-  "authToken",
-  "jwt",
-  "accessToken",
-  "paytech:token",
-  "paytech.auth.token"
 ];
 
-const AUTH_PAYLOAD_KEYS = ["auth", "user", "paytech:auth", "paytech.auth"];
+const AUTH_PAYLOAD_KEYS = [];
 
 function resolveApiBaseUrl() {
   const configuredUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL;
