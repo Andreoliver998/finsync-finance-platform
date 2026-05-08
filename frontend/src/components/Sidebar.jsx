@@ -136,8 +136,7 @@ export default function Sidebar({ collapsed, open, onCollapseToggle }) {
 
         <div className="sb-api-status">
           <span className="dot dot-green" />
-          <span>API conectada</span>
-          <span>v1.0</span>
+          <span>Sistema desenvolvido por André Oliveira</span>
         </div>
       </div>
     </aside>
