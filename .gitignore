@@ -26,6 +26,9 @@ yarn-error.log
 
 # Backups
 backups/*.zip
+backups/*.tar.gz
+backups/*.tgz
+backups/*.dump
 
 # Prisma generated internals
 .prisma

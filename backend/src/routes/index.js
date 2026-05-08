@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { env } from "../config/env.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { authRoutes } from "./authRoutes.js";
 import { cardRoutes } from "./cardRoutes.js";
@@ -22,8 +23,8 @@ export const routes = Router();
 
 routes.get("/health", (req, res) => {
   res.json({
-    success: true,
-    message: "API Financeiro Backend online."
+    status: "ok",
+    environment: env.nodeEnv
   });
 });
 

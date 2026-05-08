@@ -116,12 +116,6 @@ export function useOpenFinance() {
       const res  = await api.post("/open-finance/connections", { itemId, institution, status });
       const saved = extractPayload(res.data);
 
-      console.info("Open Finance connection saved", {
-        itemId,
-        institution,
-        status,
-      });
-
       let syncResult = null;
 
       if (saved?.id) {

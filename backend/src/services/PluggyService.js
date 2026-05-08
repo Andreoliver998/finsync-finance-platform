@@ -41,7 +41,8 @@ export class PluggyService {
       const options = {
         clientUserId: userId,
         avoidDuplicates: true,
-        products: OPEN_FINANCE_PRODUCTS
+        products: OPEN_FINANCE_PRODUCTS,
+        includeSandbox: env.pluggyIncludeSandbox
       };
 
       if (env.pluggyWebhookUrl) {

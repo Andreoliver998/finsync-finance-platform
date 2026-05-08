@@ -25,4 +25,11 @@ export class AuthController {
   static async me(req, res) {
     return res.json({ success: true, data: req.user });
   }
+
+  static async logout(req, res) {
+    return res.json({
+      success: true,
+      message: "Logout registrado. Remova o token no cliente."
+    });
+  }
 }

@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { api } from "../services/api.js";
+import { api, clearStoredAuth } from "../services/api.js";
 
 const AuthContext = createContext(null);
 
@@ -7,13 +7,39 @@ const TOKEN_KEY = "finsync:token";
 const USER_KEY  = "finsync:user";
 
 export function AuthProvider({ children }) {
-  const [user, setUser]     = useState(() => {
-    try { return JSON.parse(localStorage.getItem(USER_KEY)) || null; } catch { return null; }
-  });
-  const [token, setToken]   = useState(() => localStorage.getItem(TOKEN_KEY) || null);
-  const [loading, setLoading] = useState(false);
+  const [user, setUser]         = useState(null);
+  const [token, setToken]       = useState(null);
+  const [loading, setLoading]   = useState(false);
+  const [bootstrapping, setBootstrapping] = useState(true); // true while validating token on mount
 
-  /* Keep axios header in sync */
+  /* On mount: validate any stored token against the backend */
+  useEffect(() => {
+    const storedToken = localStorage.getItem(TOKEN_KEY);
+
+    if (!storedToken) {
+      setBootstrapping(false);
+      return;
+    }
+
+    api.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
+
+    api.get("/auth/me")
+      .then((res) => {
+        const me = res.data?.data?.user ?? res.data?.data ?? res.data?.user ?? res.data;
+        setToken(storedToken);
+        setUser(me);
+      })
+      .catch(() => {
+        // Token invalid or expired — wipe everything
+        clearStoredAuth();
+        delete api.defaults.headers.common["Authorization"];
+      })
+      .finally(() => {
+        setBootstrapping(false);
+      });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* Keep axios header in sync after bootstrap */
   useEffect(() => {
     if (token) {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -46,17 +72,21 @@ export function AuthProvider({ children }) {
   }, []);
 
   const logout = useCallback(() => {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
+    clearStoredAuth();
     setToken(null);
     setUser(null);
   }, []);
 
+  useEffect(() => {
+    window.addEventListener("finsync:auth:denied", logout);
+    return () => window.removeEventListener("finsync:auth:denied", logout);
+  }, [logout]);
+
   const isAuthenticated = Boolean(token);
 
   const value = useMemo(
-    () => ({ user, token, loading, isAuthenticated, login, logout }),
-    [user, token, loading, isAuthenticated, login, logout]
+    () => ({ user, token, loading, bootstrapping, isAuthenticated, login, logout }),
+    [user, token, loading, bootstrapping, isAuthenticated, login, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

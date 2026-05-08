@@ -1,11 +1,29 @@
+import { z } from "zod";
 import { FinancialSyncService } from "../services/FinancialSyncService.js";
+
+const objectIdParamSchema = z.object({
+  connectionId: z.string().regex(/^[a-f\d]{24}$/i, "Identificador inválido.")
+});
+
+const listTransactionsQuerySchema = z.object({
+  limit: z.coerce.number().int().positive().max(500).optional()
+}).passthrough();
+
+const dashboardSummaryQuerySchema = z.object({
+  month: z.coerce.number().int().min(1).max(12).optional(),
+  year: z.coerce.number().int().min(2000).max(2100).optional(),
+  source: z.enum(["ALL", "MANUAL", "OPEN_FINANCE"]).optional(),
+  category: z.string().trim().min(1).max(80).optional(),
+  paymentMethod: z.string().trim().min(1).max(40).optional()
+}).passthrough();
 
 export class FinancialSyncController {
   static async syncConnection(req, res, next) {
     try {
+      const { connectionId } = objectIdParamSchema.parse(req.params);
       const result = await FinancialSyncService.syncConnection({
         userId: req.user.id,
-        connectionId: req.params.connectionId
+        connectionId
       });
 
       res.json({
@@ -29,7 +47,8 @@ export class FinancialSyncController {
 
   static async listTransactions(req, res, next) {
     try {
-      const transactions = await FinancialSyncService.listTransactions(req.user.id, req.query);
+      const query = listTransactionsQuerySchema.parse(req.query);
+      const transactions = await FinancialSyncService.listTransactions(req.user.id, query);
       res.json({ success: true, data: transactions });
     } catch (error) {
       next(error);
@@ -38,7 +57,8 @@ export class FinancialSyncController {
 
   static async dashboardSummary(req, res, next) {
     try {
-      const summary = await FinancialSyncService.dashboardSummary(req.user.id, req.query);
+      const query = dashboardSummaryQuerySchema.parse(req.query);
+      const summary = await FinancialSyncService.dashboardSummary(req.user.id, query);
       res.json({ success: true, data: summary });
     } catch (error) {
       next(error);

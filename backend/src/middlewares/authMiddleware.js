@@ -13,6 +13,10 @@ export async function authMiddleware(req, res, next) {
     const token = authHeader.split(" ")[1];
     const payload = verifyToken(token);
 
+    if (!payload?.sub || typeof payload.sub !== "string") {
+      throw new HttpError(401, "Token inválido.");
+    }
+
     const user = await prisma.user.findUnique({
       where: { id: payload.sub },
       select: { id: true, name: true, email: true, createdAt: true }
