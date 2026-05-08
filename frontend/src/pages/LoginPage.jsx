@@ -171,16 +171,7 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* JWT shortcut note */}
-        <div className="jwt-note">
-          <AlertCircle size={13} style={{ flexShrink: 0, marginTop: ".1rem" }} />
-          <span>
-            <strong style={{ display: "block", marginBottom: ".15rem" }}>Sessão via localStorage</strong>
-            Se você já possui um JWT salvo no localStorage com as chaves padrão (<code style={{ fontFamily: "var(--mono)", fontSize: ".7rem" }}>token</code>, <code style={{ fontFamily: "var(--mono)", fontSize: ".7rem" }}>authToken</code> etc.), o sistema o detectará automaticamente.
-          </span>
-        </div>
-
-        <div className="login-footer">
+<div className="login-footer">
           Ainda sem conta?{" "}
           <a href="/register">Criar conta gratuita</a>
         </div>
