@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { OpenFinanceController } from "../controllers/OpenFinanceController.js";
+import { openFinanceConnectTokenRateLimitMiddleware } from "../middlewares/securityMiddleware.js";
 
 export const openFinanceRoutes = Router();
 
-openFinanceRoutes.post("/connect-token", OpenFinanceController.createConnectToken);
+openFinanceRoutes.post("/connect-token", openFinanceConnectTokenRateLimitMiddleware, OpenFinanceController.createConnectToken);
 openFinanceRoutes.get("/connections", OpenFinanceController.listConnections);
 openFinanceRoutes.post("/connections", OpenFinanceController.saveConnection);
 openFinanceRoutes.get("/items/:itemId/accounts", OpenFinanceController.getAccounts);

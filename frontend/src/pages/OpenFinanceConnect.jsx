@@ -183,7 +183,7 @@ export default function OpenFinanceConnect() {
       {isConnectOpen && connectToken && (
         <PluggyConnect
           connectToken={connectToken}
-          includeSandbox={true}
+          includeSandbox={import.meta.env.DEV}
           theme="dark"
           language="pt"
           onSuccess={handleConnectSuccess}

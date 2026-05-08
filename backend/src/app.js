@@ -1,16 +1,26 @@
 import express from "express";
-import morgan from "morgan";
 import { routes } from "./routes/index.js";
-import { corsMiddleware, helmetMiddleware, rateLimitMiddleware } from "./middlewares/securityMiddleware.js";
+import {
+  corsMiddleware,
+  helmetMiddleware,
+  rateLimitMiddleware,
+  requestLoggerMiddleware,
+  sanitizeRequestMiddleware
+} from "./middlewares/securityMiddleware.js";
 import { errorMiddleware } from "./middlewares/errorMiddleware.js";
 
 export const app = express();
+
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
 
 app.use(helmetMiddleware);
 app.use(corsMiddleware);
 app.use(rateLimitMiddleware);
 app.use(express.json({ limit: "1mb" }));
-app.use(morgan("dev"));
+app.use(sanitizeRequestMiddleware);
+app.use(requestLoggerMiddleware);
 
 app.use("/api", routes);
 

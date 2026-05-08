@@ -9,6 +9,21 @@ const bankConnectionSchema = z.object({
   status: z.string().min(1).optional()
 });
 
+const pluggyIdParamSchema = z.object({
+  itemId: z.string().trim().min(1).max(128)
+});
+
+const accountIdParamSchema = z.object({
+  accountId: z.string().trim().min(1).max(128)
+});
+
+const transactionsQuerySchema = z.object({
+  from: z.string().trim().max(40).optional(),
+  to: z.string().trim().max(40).optional(),
+  page: z.coerce.number().int().positive().max(1000).optional(),
+  pageSize: z.coerce.number().int().positive().max(500).optional()
+}).passthrough();
+
 export class OpenFinanceController {
   static async createConnectToken(req, res, next) {
     try {
@@ -53,8 +68,9 @@ export class OpenFinanceController {
 
   static async getAccounts(req, res, next) {
     try {
-      await BankConnectionService.findUserConnection(req.user.id, req.params.itemId);
-      const accounts = await PluggyService.fetchAccountsByItemId(req.params.itemId);
+      const { itemId } = pluggyIdParamSchema.parse(req.params);
+      await BankConnectionService.findUserConnection(req.user.id, itemId);
+      const accounts = await PluggyService.fetchAccountsByItemId(itemId);
       res.json({ success: true, data: accounts });
     } catch (error) {
       next(error);
@@ -63,7 +79,9 @@ export class OpenFinanceController {
 
   static async getTransactions(req, res, next) {
     try {
-      const account = await PluggyService.fetchAccountById(req.params.accountId);
+      const { accountId } = accountIdParamSchema.parse(req.params);
+      const query = transactionsQuerySchema.parse(req.query);
+      const account = await PluggyService.fetchAccountById(accountId);
 
       if (!account?.itemId) {
         throw new HttpError(404, "Conta Open Finance não encontrada.");
@@ -71,7 +89,7 @@ export class OpenFinanceController {
 
       await BankConnectionService.findUserConnection(req.user.id, account.itemId);
 
-      const transactions = await PluggyService.fetchTransactionsByAccountId(req.params.accountId, req.query);
+      const transactions = await PluggyService.fetchTransactionsByAccountId(accountId, query);
       res.json({ success: true, data: transactions });
     } catch (error) {
       next(error);
@@ -80,8 +98,9 @@ export class OpenFinanceController {
 
   static async getCreditCards(req, res, next) {
     try {
-      await BankConnectionService.findUserConnection(req.user.id, req.params.itemId);
-      const creditCards = await PluggyService.fetchCreditCardsByItemId(req.params.itemId);
+      const { itemId } = pluggyIdParamSchema.parse(req.params);
+      await BankConnectionService.findUserConnection(req.user.id, itemId);
+      const creditCards = await PluggyService.fetchCreditCardsByItemId(itemId);
       res.json({ success: true, data: creditCards });
     } catch (error) {
       next(error);

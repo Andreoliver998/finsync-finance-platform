@@ -19,6 +19,7 @@ FinSync is a PayTech/Open Finance platform for personal and business financial c
 ├── frontend/
 ├── docs/
 ├── backups/
+├── ecosystem.config.cjs
 ├── README.md
 ├── .gitignore
 └── package.json
@@ -129,11 +130,20 @@ cd frontend && npm run dev
 ## Production Overview
 
 - Build frontend static assets with `npm run build --prefix frontend`
-- Run backend with PM2 or an equivalent process manager
+- Run backend with PM2 using `ecosystem.config.cjs`
 - Put NGINX in front of the frontend and API
 - Enforce HTTPS
 - Configure production Pluggy access, webhook URL, and OAuth redirect URL
 - Store secrets in the server environment or a managed secret store
+
+Production runbooks live in:
+
+- `docs/deploy-hostinger.md`
+- `docs/nginx-production.conf.example`
+- `docs/ssl-setup.md`
+- `docs/pluggy-production.md`
+- `docs/mongodb-production.md`
+- `docs/production-readiness-final.md`
 
 ## Security
 

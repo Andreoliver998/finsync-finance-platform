@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { api } from "../services/api.js";
+import { api, clearStoredAuth } from "../services/api.js";
 
 const AuthContext = createContext(null);
 
@@ -46,11 +46,15 @@ export function AuthProvider({ children }) {
   }, []);
 
   const logout = useCallback(() => {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
+    clearStoredAuth();
     setToken(null);
     setUser(null);
   }, []);
+
+  useEffect(() => {
+    window.addEventListener("finsync:auth:denied", logout);
+    return () => window.removeEventListener("finsync:auth:denied", logout);
+  }, [logout]);
 
   const isAuthenticated = Boolean(token);
 
